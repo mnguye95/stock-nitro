@@ -10,12 +10,15 @@ import {
 } from "firebase/auth";
 import {
   doc,
+  update,
   updateDoc,
   collection,
   query,
   where,
   onSnapshot,
-  addDoc
+  addDoc,
+  FieldValue,
+  Timestamp
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
@@ -27,30 +30,18 @@ export const AuthContextProvider = ({ children }) => {
   const [details, setDetails] = useState(JSON.parse(localStorage.getItem('details')) || {
     id: "",
     uid: "",
-    details: {
-      name: "",
-      phone: "",
-      company: "",
-      website: "",
-    },
-    services: {
-      audit: {
-        limit: 15,
-        uses: 0,
-      },
-      descriptions: {
-        limit: 15,
-        uses: 0,
-      },
-      suggestions: {
-        limit: 15,
-        uses: 0,
-      },
-      images: {
-        limit: 50,
-        uses: 0,
-      },
-    },
+    name: "",
+    email: "",
+    starting: 0,
+    current: 0,
+    trades: {}
+  });
+  
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0, 
+    minimumFractionDigits: 0, 
   });
 
   const handleDetails = (details) => {
@@ -65,25 +56,8 @@ export const AuthContextProvider = ({ children }) => {
         try {
           let newUser = {
             uid: userCredential.user.uid,
-            services: {
-              audit: {
-                uses: 0,
-                limit: 15,
-              },
-              descriptions: {
-                uses: 0,
-                limit: 15,
-              },
-              suggestions: {
-                uses: 0,
-                limit: 15,
-              },
-              images: {
-                uses: 0,
-                limit: 15,
-              },
-            },
-            details: info,
+            ...info,
+            trades: {},
           };
           const docRef = await addDoc(collection(db, "usage"), newUser);
           console.log("Document written with ID: ", docRef.id);
@@ -102,6 +76,59 @@ export const AuthContextProvider = ({ children }) => {
   const forgotPassword = (email) => {
     return sendPasswordResetEmail(auth, email);
   };
+
+  const closeTrade = async (trade) => {
+    console.log(trade);
+    const {day, timestamp, price_sold, quanity} = trade;
+    const tradeTimestamp = Timestamp.now().toDate();
+    const timeSold = tradeTimestamp.getTime();
+    let updatedTrades = {};
+    if (details.trades[day.key]?.positions !== undefined) {
+      updatedTrades = details.trades[day.key]?.positions;
+    }
+    updatedTrades[timestamp] = {...updatedTrades[timestamp], time_sold: timeSold, sell_price: price_sold}
+    console.log(updatedTrades);
+    await updateDoc(doc(db, "usage", details.id), {
+      ...details,
+      current: details.current + (quanity * (price_sold * 100)),
+      trades: {
+        ...details.trades,
+        [day.key]: {
+          positions: updatedTrades
+        } 
+      }
+    }).finally(() => '');
+  }
+
+  const addTrade = async (payload) => {
+    const tradeTimestamp = Timestamp.now().toDate();
+    const today = tradeTimestamp.toLocaleString().split(',')[0];
+    let starting = details.trades[today]?.starting;
+    if (!starting) {
+      starting = details.current
+    }
+    let updatedTrades = {};
+    if (details.trades[today]?.positions !== undefined) {
+      updatedTrades = details.trades[today]?.positions;
+    }
+    console.log(updatedTrades);
+    updatedTrades[tradeTimestamp.getTime()] = payload
+    if (details.current - payload.total >= 0) {
+      await updateDoc(doc(db, "usage", details.id), {
+        ...details,
+        current: details.current - payload.total,
+        trades: {
+          ...details.trades,
+          [today]: {
+            starting,
+            positions: updatedTrades
+          } 
+        }
+      }).finally(() => '');
+    } else {
+      return false
+    }
+  }
 
   const updateUsage = async (service) => {
     await updateDoc(doc(db, "usage", details.id), {
@@ -123,7 +150,7 @@ export const AuthContextProvider = ({ children }) => {
     }).finally(() => console.log(details));
   };
 
-  const logIn = (email, password) => {
+  const logIn = async (email, password) => {
     return signInWithEmailAndPassword(auth, email, password).then(
       (UserCredentials) => {
         const q = query(
@@ -133,6 +160,7 @@ export const AuthContextProvider = ({ children }) => {
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
           let limit = [];
           querySnapshot.forEach((doc) => {
+            console.log(doc);
             limit.push({ ...doc.data(), id: doc.id });
           });
           handleDetails(limit[0]);
@@ -177,9 +205,12 @@ export const AuthContextProvider = ({ children }) => {
         logIn,
         forgotPassword,
         sendVerification,
+        addTrade,
+        closeTrade,
         updateUsage,
         updateDetails,
         navigate,
+        formatter
       }}
     >
       {children}

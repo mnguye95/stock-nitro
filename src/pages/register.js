@@ -4,16 +4,15 @@ import { UserAuth } from "../context/AuthContext";
 import Navbar from "../components/navbar";
 
 export default function SignUp() {
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [details, setDetails] = useState({
     name: "",
-    company: "",
-    website: "",
-    phone: 0,
+    email: "",
+    starting: 0,
+    current: 0
   });
-  const { createUser, user, navigate } = UserAuth();
+  const { createUser, user, navigate, formatter } = UserAuth();
 
   function validate(email) {
     return /\S+@\S+\.\S+/.test(email);
@@ -27,11 +26,11 @@ export default function SignUp() {
   }, []);
 
   const handleSubmit = async (e) => {
-    if (validate(email)) {
+    if (validate(details.email)) {
       e.preventDefault();
       setError("");
       try {
-        await createUser(email, password, details);
+        await createUser(details.email, password, details);
         navigate("/");
       } catch (e) {
         setError(e.message);
@@ -76,7 +75,7 @@ export default function SignUp() {
                     required
                   />
                   <input
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => setDetails({ ...details, email: e.target.value})}
                     className="border border-purple-gray rounded-md font-space-grotesk p-3 m-2"
                     type="email"
                     placeholder="Email Address"
@@ -89,6 +88,13 @@ export default function SignUp() {
                     placeholder="Password * (Minimum: 8 characters)"
                     pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                     title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+                    required
+                  />
+                  <input
+                    onChange={(e) => setDetails({ ...details, current: e.target.value, starting: e.target.value})}
+                    className="border border-purple-gray rounded-md font-space-grotesk p-3 m-2"
+                    type="number"
+                    placeholder="Starting Amount $"
                     required
                   />
                 </div>

@@ -9,6 +9,8 @@ import ProtectedRoute from './components/ProtectedRoute'
 
 import Home from './pages/home';
 import { AuthContextProvider } from './context/AuthContext';
+import 'react-tooltip/dist/react-tooltip.css';
+import 'reactjs-popup/dist/index.css';
 
 
 function App() {

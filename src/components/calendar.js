@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import moment from "moment";
+import { Tooltip } from "react-tooltip";
 
 const Calendar = (props) => {
   const [state, setState] = useState({
@@ -7,7 +8,7 @@ const Calendar = (props) => {
     today: moment(),
     showMonthPopup: false,
     showYearPopup: false,
-    selectedDay: null,
+    selectedDay: moment(),
   });
 
   const weekdays = moment.weekdays();
@@ -148,20 +149,36 @@ const Calendar = (props) => {
   };
 
   const onDayClick = (e, day) => {
-    setState({ ...state, selectedDay: day });
-    console.log("SELECTED DAY: ", state.selectedDay);
-    props.onDayClick && props.onDayClick(e, day);
+    setState({
+      ...state,
+      selectedDay: moment(
+        `${state.dateContext.format("MM")}/${day}/${state.dateContext.format(
+          "YYYY"
+        )}`
+      ),
+    });
+    props.onDayClick &&
+      props.onDayClick(
+        e,
+        moment(
+          `${state.dateContext.format("MM")}/${day}/${state.dateContext.format(
+            "YYYY"
+          )}`
+        )
+      );
   };
 
-
-
   let cells = [];
-  let defaultCellStyle = "flex flex-col p-1 rounded-[2%] text-black bg-white font-bungee text-2xl";
+  let defaultCellStyle =
+    "flex flex-col p-1 rounded-[2%] text-black bg-white font-bungee text-2xl";
 
   // Names of Weekdays
   let namesOfDays = weekdaysShort.map((day) => {
     return (
-      <div key={day} className={defaultCellStyle + ' items-center justify-center'}>
+      <div
+        key={day}
+        className={defaultCellStyle + " items-center justify-center"}
+      >
         {day}
       </div>
     );
@@ -170,31 +187,63 @@ const Calendar = (props) => {
   for (let i = 0; i < firstDayOfMonth(); i++) {
     cells.push({
       day: null,
-      className: defaultCellStyle
+      className: defaultCellStyle,
     });
   }
 
   for (let d = 1; d <= daysInMonth(); d++) {
     let className = defaultCellStyle;
     if (d < currentDate()) {
-      className += ' cursor-pointer bg-white hover:border-black border-2 hover:scale-105 duration-100'; 
+      className +=
+        " cursor-pointer bg-white hover:border-black border-2 hover:scale-105 duration-100";
+      // eslint-disable-next-line
     } else if (d == currentDay()) {
-      className += ' cursor-pointer bg-yellow-100 hover:border-black border-2 hover:scale-105 duration-100';
+      className +=
+        " cursor-pointer bg-yellow-100 hover:border-black border-2 hover:scale-105 duration-100";
     }
     if (d > currentDate()) {
-      className += ' bg-gray-100'; 
+      className += " bg-gray-100";
     }
-    if (d == state.selectedDay) {
-      className += ' border-black border-2';
+    // eslint-disable-next-line
+    if (d == state.selectedDay.format("D")) {
+      className += " border-black border-2";
     }
-    cells.push(
-      {
-        day: d,
-        className: className,
-        trades: props.trades[d] || []
-      }
-    );
+
+    // let dayTrades = [];
+    // let trades =
+    //   props.trades[
+    //     `${state.dateContext.format("MM")}/${d}/${state.dateContext.format(
+    //       "YYYY"
+    //     )}`
+    //   ];
+    // if (trades) {
+    //   for (const trade in trades['positions']) {
+    //     dayTrades.push({ time: trade, ...trades['positions'][trade] });
+    //   }
+    // }
+
+    let trades = [];
+    let dayTrades = props.trades[
+      `${state.dateContext.format("MM")}/${d}/${state.dateContext.format(
+        "YYYY"
+      )}`
+    ] || [];
+    const positions = dayTrades["positions"] || {};
+    Object.keys(positions).sort().forEach((key) => {
+      let trade = positions[key];
+      trades.push(
+        { time: key, ...trade });
+    });
+
+    cells.push({
+      day: d,
+      className: className,
+      trades: trades,
+    });
   }
+
+  //
+  console.log();
 
   // console.log("days: ", daysInMonth);
 
@@ -255,19 +304,44 @@ const Calendar = (props) => {
   return (
     <div className="grid grid-cols-7 grid-rows-5 md:gap-2 w-full h-full">
       {/* {namesOfDays} */}
-      {cells.map((cell,i) => {
+      {cells.map((cell, i) => {
         if (!cell.day) {
-          return <div key={i*50} className={cell.className}></div>
+          return <div key={i * 50} className={cell.className}></div>;
         }
-        return <div onClick={(e) => cell.day <= currentDay() && onDayClick(e, cell.day)} key={i + cell.day} className={cell.className}>
-          {cell.day}
-          <duv className="flex flex-wrap gap-2">
-            {cell.trades.map((trade,index) => (<div key={index} className={`${trade.buy_price > trade.sell_price ? 'bg-red-600' : 'bg-green-500'} rounded-full p-[0.3em]`}></div>))}
-          </duv>
-        </div>
+        return (
+          <div
+            onClick={(e) => cell.day <= currentDay() && onDayClick(e, cell.day)}
+            key={i + cell.day}
+            className={cell.className}
+          >
+            {cell.day}
+            <div className="md:flex flex-wrap gap-2 hidden">
+              {cell.trades.map((trade, index) => (
+                <div key={index}>
+                  <div
+                    id={`trade-${cell.day}-${index}`}
+                    key={index}
+                    className={`${
+                      trade.sell_price
+                        ? trade.buy_price > trade.sell_price
+                          ? "bg-red-600"
+                          : "bg-green-500"
+                        : "bg-gray-400"
+                    } rounded-full border-2 border-black p-[0.3em]`}
+                  ></div>
+                  <Tooltip
+                    key={`tooltip-${cell.day}-${index}`}
+                    anchorId={`trade-${cell.day}-${index}`}
+                    content={trade.sell_price ? `${ Math.round((trade.sell_price - trade.buy_price) / trade.buy_price * 100) / 100 * 100}%` : ''}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
       })}
     </div>
-  )
+  );
 };
 
-export default Calendar
+export default Calendar;
