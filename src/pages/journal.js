@@ -11,16 +11,17 @@ import Popup from "reactjs-popup";
 const Journal = () => {
   const { details, addTrade, closeTrade, formatter } = UserAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [today, setToday] = useState(
-    moment()
-  );
+  const [today, setToday] = useState(moment());
   const [day, selectDay] = useState({
     key: moment().format("MM/DD/YYYY"),
     text: moment().format("MMM Do YYYY"),
   });
   const [confirmBuy, setConfirmBuy] = useState(false);
   const [confirmSell, setConfirmSell] = useState("");
-  const [priceSold, setPriceSold] = useState(0);
+  const [sellPayload, setSellPayload] = useState({
+    sellPrice: 0,
+    sellNotes: ''
+  });
   const [error, setError] = useState("");
   const [entry, setEntry] = useState({
     type: "",
@@ -29,7 +30,8 @@ const Journal = () => {
     sell_price: null,
     time_sold: null,
     total: 0,
-    notes: "",
+    sell_notes: "",
+    buy_notes: "",
   });
 
   function refreshClock() {
@@ -45,27 +47,26 @@ const Journal = () => {
 
   const handleTrade = async () => {
     if (entry.quanity > 0 && entry.buy_price > 0) {
-      let writeCheck = await addTrade(entry);
-      setEntry({
-        type: "",
-        quanity: 0,
-        buy_price: 0,
-        sell_price: null,
-        time_sold: null,
-        total: 0,
-        notes: "",
-      })
+      await addTrade(entry).finally(() =>
+        setEntry({
+          type: "",
+          quanity: 0,
+          buy_price: 0,
+          sell_price: null,
+          time_sold: null,
+          total: 0,
+          sell_notes: "",
+          buy_notes: "",
+        })
+      );
     } else {
       setError("Please add a quanity and fill price.");
     }
   };
 
   const handleClose = async (trade) => {
-    if (priceSold > 0) {
+    if (sellPayload.sellPrice > 0) {
       let closeConfirm = await closeTrade(trade);
-      if (!closeConfirm) {
-        setError("Insufficient Funds.");
-      }
     } else {
       setError("Please add a sell price.");
     }
@@ -80,29 +81,44 @@ const Journal = () => {
   let trades = [];
   const dayTrades = details.trades[day.key] || {};
   const positions = dayTrades["positions"] || {};
-  Object.keys(positions).sort().forEach((key) => {
-    let trade = positions[key];
-    let pL = Math.round((trade.sell_price - trade.buy_price) / trade.buy_price * 100) / 100
-    let sold = trade.sell_price > 0;
-    console.log(pL);
-    trades.push(
-      <tr
-        key={key}
-        className={`${
-          trade.sell_price ? (trade.buy_price < trade.sell_price ? 'bg-green-400' : 'bg-red-400') : ''
-        }`}
-        id={`row-${key}`}
-      >
-        <td>{moment(parseInt(key)).format("h:mmA")}</td>
-        <td>{trade.type}</td>
-        <td>{trade.quanity}</td>
-        <td>{formatter.format(trade.buy_price)}</td>
-        <td>{formatter.format(trade.total)}</td>
-        <td>{trade.sell_price && `${pL * 100}%`}</td>
-        <td>
-          {sold ? (
-            formatter.format(trade.sell_price)
-          ) : (
+  Object.keys(positions)
+    .sort()
+    .forEach((key) => {
+      let trade = positions[key];
+      let pL = Math.round(
+        ((trade.sell_price - trade.buy_price) / trade.buy_price) * 100
+      );
+      let sold = trade.sell_price > 0;
+      console.log(pL);
+      trades.push(
+        <tr
+          key={key}
+          className={`${
+            trade.sell_price
+              ? trade.buy_price < trade.sell_price
+                ? "bg-green-300"
+                : "bg-red-300"
+              : ""
+          }`}
+          id={`row-${key}`}
+        >
+          <td>{moment(parseInt(key)).format("h:mmA")}</td>
+          <td>{trade.type}</td>
+          {/* <td>{trade.quanity}</td> */}
+          <td>{formatter.format(trade.buy_price)}</td>
+          <td>
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+              maximumFractionDigits: 0,
+              minimumFractionDigits: 0,
+            }).format(trade.total)}
+          </td>
+          <td>{trade.sell_price && `${pL}%`}</td>
+          <td>
+            {sold ? (
+              formatter.format(trade.sell_price)
+            ) : (
               <Popup
                 modal={true}
                 repositionOnResize={true}
@@ -113,62 +129,83 @@ const Journal = () => {
                     className="rounded-md text-sm font-bungee bg-red-400 border border-black cursor-pointer hover:scale-105 duration-75"
                   >
                     SELL
-                  </p>}
+                  </p>
+                }
                 position="left center"
               >
                 <div className="flex flex-col items-center gap-4 p-16 mx-auto">
-                  <p className="text-4xl text-center font-bold">Close {trade.type}</p>
+                  <p className="text-4xl text-center font-bold">
+                    Close {trade.type}
+                  </p>
                   <div className="grid grid-cols-2 border-purple-gray border-4 rounded-md">
-                    <p className="text-2xl font-bold p-2 text-center">Buy Time: {moment(parseInt(key)).format("h:mmA")}</p>
-                    <p className="text-2xl font-bold p-2 text-center">Quanity: {trade.quanity}</p>
-                    <p className="text-2xl font-bold p-2 text-center">Cost: {formatter.format(trade.buy_price)}</p>
-                    <p className="text-2xl font-bold p-2 text-center">Total: {formatter.format(trade.total)}</p>
+                    <p className="text-2xl font-bold p-2 text-center">
+                      Buy Time: {moment(parseInt(key)).format("h:mmA")}
+                    </p>
+                    <p className="text-2xl font-bold p-2 text-center">
+                      Quanity: {trade.quanity}
+                    </p>
+                    <p className="text-2xl font-bold p-2 text-center">
+                      Cost: {formatter.format(trade.buy_price)}
+                    </p>
+                    <p className="text-2xl font-bold p-2 text-center">
+                      Total: {formatter.format(trade.total)}
+                    </p>
                   </div>
-                <p className="font-bold text-2xl">
-                  Sell Price
-                </p>
-                <input
-                  className="rounded-md border border-purple-gray p-2 appearance-none"
-                  onChange={(e) => setPriceSold(e.target.value)}
-                  type={"number"}
-                  placeholder="Enter Close Price"
-                />
-                <button
-                  className="text-2xl font-bold bg-red-200 py-1 px-5 rounded-md font-space-grotesk hover:scale-105 duration-75"
-                  onClick={() =>
-                    handleClose({
-                      day: day,
-                      timestamp: key,
-                      price_sold: priceSold,
-                      quanity: trade.quanity,
-                    })
-                  }
-                >Confirm</button> 
-                <div className="flex gap-1">
-                  <div className="flex flex-col">
-                    <label className="font-bungee" htmlFor="notes">
-                      Notes
-                    </label>
-                    <textarea
-                      id="notes"
-                      className="rounded-md p-1 border-purple-gray border h-full resize-none"
-                      type={"text"}
-                      onChange={(e) =>
-                        setEntry({ ...entry, notes: e.target.value })
-                      }
-                      value={entry.notes}
-                    ></textarea>
-                </div>
-                </div>
-                <p className="font-bold text-2xl">
-                {today.format("MMMM Do YYYY, h:mm:ss a")}</p>
+                  <p className="font-bold text-2xl">Sell Price</p>
+                  <input
+                    className="rounded-md border border-purple-gray p-2 appearance-none"
+                    onChange={(e) => setSellPayload({...sellPayload, sellPrice: e.target.value})}
+                    type={"number"}
+                    placeholder="Enter Close Price"
+                  />
+                  <button
+                    className="text-2xl font-bold bg-red-200 py-1 px-5 rounded-md font-space-grotesk hover:scale-105 duration-75"
+                    onClick={() =>
+                      handleClose({
+                        day: day,
+                        timestamp: key,
+                        price_sold: sellPayload.sellPrice,
+                        sell_notes: sellPayload.sellNotes,
+                        quanity: trade.quanity,
+                      })
+                    }
+                  >
+                    Confirm
+                  </button>
+                  <div className="flex gap-1">
+                    <div className="flex flex-col">
+                      <label className="font-bungee" htmlFor="notes">
+                        Notes
+                      </label>
+                      <textarea
+                        id="notes"
+                        className="rounded-md p-1 border-purple-gray border h-full resize-none"
+                        type={"text"}
+                        onChange={(e) =>
+                          setSellPayload({...sellPayload, sellNotes: e.target.value})
+                        }
+                        value={sellPayload.sellNotes}
+                      ></textarea>
+                    </div>
+                  </div>
+                  <p className="font-bold text-2xl">
+                    {today.format("MMMM Do YYYY, h:mm:ss a")}
+                  </p>
                 </div>
               </Popup>
-          )}
-        </td>
-      </tr>
-    );
-  });
+            )}
+          </td>
+          <Tooltip
+            key={key}
+            anchorId={`row-${key}`}
+            // content={`Buy Notes: ${trade.buy_notes} Sell Notes: ${trade.sell_notes}`}
+            place="bottom"
+          >
+            Buy Notes: {trade.buy_notes} <br></br> Sell Notes: {trade.sell_notes}
+          </Tooltip>
+        </tr>
+      );
+    });
 
   return (
     <div className="w-full md:h-screen bg-white md:overflow-hidden">
@@ -189,9 +226,9 @@ const Journal = () => {
               <p className="text-green-500">
                 &nbsp;{" "}
                 {Math.round(
-                  (details.starting - details.current) / details.starting
-                )}
-                % YTD
+                  (details.current - details.starting) / details.starting
+                 * 100)}
+                %
               </p>
             </div>
           </div>
@@ -208,7 +245,7 @@ const Journal = () => {
                   <tr>
                     <th>Time</th>
                     <th>Type</th>
-                    <th>Qty</th>
+                    {/* <th>Qty</th> */}
                     <th>Buy</th>
                     <th>$</th>
                     <th>P/L</th>
@@ -234,9 +271,9 @@ const Journal = () => {
                     className="rounded-md p-1 border-purple-gray border h-full resize-none"
                     type={"text"}
                     onChange={(e) =>
-                      setEntry({ ...entry, notes: e.target.value })
+                      setEntry({ ...entry, buy_notes: e.target.value })
                     }
-                    value={entry.notes}
+                    value={entry.buy_notes}
                   ></textarea>
                 </div>
                 <div className="flex flex-col gap-1 h-full w-1/2 justify-center">
@@ -299,7 +336,9 @@ const Journal = () => {
                   {error}
                 </p>
               ) : (
-                <p className="text-center text-lg font-bungee">{today.format("MMMM Do YYYY, h:mm:ss a")}</p>
+                <p className="text-center text-lg font-bungee">
+                  {today.format("MMMM Do YYYY, h:mm:ss a")}
+                </p>
               )}
             </div>
             {confirmBuy ? (

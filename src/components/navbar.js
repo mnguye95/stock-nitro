@@ -11,11 +11,11 @@ import Logo from "../assets/flame.svg";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [time, setTime] = useState({
-    threeMins: '',
-    fiveMins: '',
-    fifthteenMins: '',
-    thirtyMins:'' ,
-    hour: ''
+    threeMins: "",
+    fiveMins: "",
+    fifthteenMins: "",
+    thirtyMins: "",
+    hour: "",
   });
   const scrollPosition = useScrollPosition();
   const { user, logOut, navigate } = UserAuth();
@@ -27,7 +27,7 @@ const Navbar = () => {
 
     // desired timers in seconds
     const everyThree = 3 * 60;
-    const everyFive = 15 * 60;
+    const everyFive = 5 * 60;
     const everyFifthteen = 15 * 60;
     const everyThirty = 30 * 60;
     const everyHour = 60 * 60;
@@ -48,31 +48,42 @@ const Navbar = () => {
 
     const threeTime = {
       mins: Math.floor(threeLeft / 60),
-      secs: threeLeft % 60
+      secs: threeLeft % 60,
     };
     const fiveTime = {
       mins: Math.floor(fiveLeft / 60),
-      secs: fiveLeft % 60
+      secs: fiveLeft % 60,
     };
     const fifthteenTime = {
       mins: Math.floor(fifthteenLeft / 60),
-      secs: fifthteenLeft % 60
+      secs: fifthteenLeft % 60,
     };
     const thirtyTime = {
       mins: Math.floor(thirtyLeft / 60),
-      secs: thirtyLeft % 60
+      secs: thirtyLeft % 60,
     };
     const hourTime = {
       mins: Math.floor(hourLeft / 60),
-      secs: hourLeft % 60
+      secs: hourLeft % 60,
     };
 
     setTime({
-      threeMins: threeTime.mins + ':' + ('0' + threeTime.secs).slice(-2),
-      fiveMins: fiveTime.mins + ':' + ('0' + fiveTime.secs).slice(-2),
-      fifthteenMins: fifthteenTime.mins + ':' + ('0' + fifthteenTime.secs).slice(-2),
-      thirtyMins: thirtyTime.mins + ':' + ('0' + thirtyTime.secs).slice(-2),
-      hour: hourTime.mins + ':' + ('0' + hourTime.secs).slice(-2),
+      threeMins:
+        ("0" + threeTime.mins).slice(-2) +
+        ":" +
+        ("0" + threeTime.secs).slice(-2),
+      fiveMins:
+        ("0" + fiveTime.mins).slice(-2) + ":" + ("0" + fiveTime.secs).slice(-2),
+      fifthteenMins:
+        ("0" + fifthteenTime.mins).slice(-2) +
+        ":" +
+        ("0" + fifthteenTime.secs).slice(-2),
+      thirtyMins:
+        ("0" + thirtyTime.mins).slice(-2) +
+        ":" +
+        ("0" + thirtyTime.secs).slice(-2),
+      hour:
+        ("0" + hourTime.mins).slice(-2) + ":" + ("0" + hourTime.secs).slice(-2),
     });
   }
 
@@ -98,7 +109,7 @@ const Navbar = () => {
       {/* Top or Desktop Nav */}
       <div className="flex w-full">
         <div className="flex justify-between w-full p-[15px] md:px-[50px] mx-auto">
-          <div className="flex">
+          <div className="flex items-center">
             <Link
               to="/"
               className="flex lg:text-3xl text-2xl font-bungee text-magic-mint items-center mr-5"
@@ -120,16 +131,34 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-          <div id="candles" className="flex gap-4 justify-between">
-            <div className="text-xl text-white">{time?.threeMins}</div>
-            <div className="text-xl text-white">{time?.fiveMins}</div>
-            <div className="text-xl text-white">{time?.fifthteenMins}</div>
-            <div className="text-xl text-white">{time?.thirtyMins}</div>
-            <div className="text-xl text-white">{time?.hour}</div>
+          <div
+            id="candles"
+            className="flex gap-16 justify-between items-center font-bungee"
+          >
+            <div className="flex flex-col items-center">
+              <p className="text-2xl text-white font-bungee">3min </p>
+              <p className="text-2xl text-white font-space-grotesk">{time?.threeMins}</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <p className="text-2xl text-white font-bungee">5min </p>
+              <p className="text-2xl text-white font-space-grotesk">{time?.fiveMins}</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <p className="text-2xl text-white font-bungee">15min </p>
+              <p className="text-2xl text-white font-space-grotesk">{time?.fifthteenMins}</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <p className="text-2xl text-white font-bungee">30min </p>
+              <p className="text-2xl text-white font-space-grotesk">{time?.thirtyMins}</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <p className="text-2xl text-white font-bungee">1hr </p>
+              <p className="text-2xl text-white font-space-grotesk">{time?.hour}</p>
+            </div>
           </div>
 
           {user ? (
-            <div className="flex">
+            <div className="flex gap-4 justify-between items-center font-space-grotesk">
               <p
                 onClick={handleClick}
                 className="md:flex hidden font-space-grotesk text-purple-gray bg-magic-mint md:text-2xl text-xl items-center py-[10px] px-[15px] rounded-lg cursor-pointer hover:underline underline-offset-4 decoration-1 hover:-translate-y-0.5 duration-75"

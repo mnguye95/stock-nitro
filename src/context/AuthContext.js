@@ -40,8 +40,6 @@ export const AuthContextProvider = ({ children }) => {
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: 0, 
-    minimumFractionDigits: 0, 
   });
 
   const handleDetails = (details) => {
@@ -79,14 +77,14 @@ export const AuthContextProvider = ({ children }) => {
 
   const closeTrade = async (trade) => {
     console.log(trade);
-    const {day, timestamp, price_sold, quanity} = trade;
+    const {day, timestamp, price_sold, sell_notes, quanity} = trade;
     const tradeTimestamp = Timestamp.now().toDate();
     const timeSold = tradeTimestamp.getTime();
     let updatedTrades = {};
     if (details.trades[day.key]?.positions !== undefined) {
       updatedTrades = details.trades[day.key]?.positions;
     }
-    updatedTrades[timestamp] = {...updatedTrades[timestamp], time_sold: timeSold, sell_price: price_sold}
+    updatedTrades[timestamp] = {...updatedTrades[timestamp], time_sold: timeSold, sell_price: price_sold, sell_notes}
     console.log(updatedTrades);
     await updateDoc(doc(db, "usage", details.id), {
       ...details,

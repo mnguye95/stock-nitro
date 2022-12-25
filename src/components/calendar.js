@@ -324,15 +324,15 @@ const Calendar = (props) => {
                     className={`${
                       trade.sell_price
                         ? trade.buy_price > trade.sell_price
-                          ? "bg-red-600"
-                          : "bg-green-500"
-                        : "bg-gray-400"
+                          ? "bg-red-300"
+                          : "bg-green-300"
+                        : "bg-gray-300"
                     } rounded-full border-2 border-black p-[0.3em]`}
                   ></div>
                   <Tooltip
                     key={`tooltip-${cell.day}-${index}`}
                     anchorId={`trade-${cell.day}-${index}`}
-                    content={trade.sell_price ? `${ Math.round((trade.sell_price - trade.buy_price) / trade.buy_price * 100) / 100 * 100}%` : ''}
+                    content={trade.sell_price ? `${ Math.round((trade.sell_price - trade.buy_price) / trade.buy_price * 100)}%` : ''}
                   />
                 </div>
               ))}
