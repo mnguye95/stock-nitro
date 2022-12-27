@@ -136,24 +136,24 @@ const Navbar = () => {
             className="flex gap-16 justify-between items-center font-bungee"
           >
             <div className="flex flex-col items-center">
-              <p className="text-2xl text-white font-bungee">3min </p>
-              <p className="text-2xl text-white font-space-grotesk">{time?.threeMins}</p>
+              <p className="text-xl text-white font-bungee">3min </p>
+              <p className="text-xl text-white font-space-grotesk">{time?.threeMins}</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-2xl text-white font-bungee">5min </p>
-              <p className="text-2xl text-white font-space-grotesk">{time?.fiveMins}</p>
+              <p className="text-xl text-white font-bungee">5min </p>
+              <p className="text-xl text-white font-space-grotesk">{time?.fiveMins}</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-2xl text-white font-bungee">15min </p>
-              <p className="text-2xl text-white font-space-grotesk">{time?.fifthteenMins}</p>
+              <p className="text-xl text-white font-bungee">15min </p>
+              <p className="text-xl text-white font-space-grotesk">{time?.fifthteenMins}</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-2xl text-white font-bungee">30min </p>
-              <p className="text-2xl text-white font-space-grotesk">{time?.thirtyMins}</p>
+              <p className="text-xl text-white font-bungee">30min </p>
+              <p className="text-xl text-white font-space-grotesk">{time?.thirtyMins}</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-2xl text-white font-bungee">1hr </p>
-              <p className="text-2xl text-white font-space-grotesk">{time?.hour}</p>
+              <p className="text-xl text-white font-bungee">1hr </p>
+              <p className="text-xl text-white font-space-grotesk">{time?.hour}</p>
             </div>
           </div>
 

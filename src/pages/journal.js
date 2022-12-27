@@ -46,27 +46,39 @@ const Journal = () => {
   }, []);
 
   const handleTrade = async () => {
-    if (entry.quanity > 0 && entry.buy_price > 0) {
-      await addTrade(entry).finally(() =>
-        setEntry({
-          type: "",
-          quanity: 0,
-          buy_price: 0,
-          sell_price: null,
-          time_sold: null,
-          total: 0,
-          sell_notes: "",
-          buy_notes: "",
-        })
-      );
+    if (entry.total <= details.current) {
+      if (entry.quanity > 0 && entry.buy_price > 0) {
+        await addTrade(entry).finally(() =>
+          {
+            setEntry({
+              type: "",
+              quanity: 0,
+              buy_price: 0,
+              sell_price: null,
+              time_sold: null,
+              total: 0,
+              sell_notes: "",
+              buy_notes: "",
+            })
+            setConfirmBuy(false)
+          }
+        );
+      } else {
+        setError("Please add a quanity and fill price.");
+      }
     } else {
-      setError("Please add a quanity and fill price.");
+      setError("Insufficient Funds.");
     }
   };
 
   const handleClose = async (trade) => {
     if (sellPayload.sellPrice > 0) {
-      let closeConfirm = await closeTrade(trade);
+      await closeTrade(trade).finally(()=>{
+        setSellPayload({
+          sellPrice: 0,
+          sellNotes: ''
+        })
+      });
     } else {
       setError("Please add a sell price.");
     }
@@ -95,26 +107,19 @@ const Journal = () => {
           key={key}
           className={`${
             trade.sell_price
-              ? trade.buy_price < trade.sell_price
-                ? "bg-green-300"
-                : "bg-red-300"
+              ? trade.buy_price == trade.sell_price
+                ? "bg-yellow-300"
+                : (trade.buy_price < trade.sell_price
+                  ? "bg-green-300"
+                  : "bg-red-300")
               : ""
           }`}
           id={`row-${key}`}
         >
           <td>{moment(parseInt(key)).format("h:mmA")}</td>
           <td>{trade.type}</td>
-          {/* <td>{trade.quanity}</td> */}
+          <td>{trade.quanity}</td>
           <td>{formatter.format(trade.buy_price)}</td>
-          <td>
-            {new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-              maximumFractionDigits: 0,
-              minimumFractionDigits: 0,
-            }).format(trade.total)}
-          </td>
-          <td>{trade.sell_price && `${pL}%`}</td>
           <td>
             {sold ? (
               formatter.format(trade.sell_price)
@@ -195,6 +200,21 @@ const Journal = () => {
               </Popup>
             )}
           </td>
+          {/* <td>
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+              maximumFractionDigits: 0,
+              minimumFractionDigits: 0,
+            }).format(trade.total)}
+          </td> */}
+          {/* <td>{trade.sell_price && `${pL}%`}</td> */}
+          <td>{trade.sell_price && `${new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+              maximumFractionDigits: 0,
+              minimumFractionDigits: 0,
+            }).format(((trade.sell_price - trade.buy_price) * 100) * trade.quanity)}`}</td>
           <Tooltip
             key={key}
             anchorId={`row-${key}`}
@@ -245,11 +265,11 @@ const Journal = () => {
                   <tr>
                     <th>Time</th>
                     <th>Type</th>
-                    {/* <th>Qty</th> */}
+                    <th>Qty</th>
                     <th>Buy</th>
-                    <th>$</th>
-                    <th>P/L</th>
                     <th>Sell</th>
+                    {/* <th>$</th> */}
+                    <th>P/L</th>
                   </tr>
                 </thead>
                 <tbody>{trades}</tbody>

@@ -101,10 +101,11 @@ export const AuthContextProvider = ({ children }) => {
   const addTrade = async (payload) => {
     const tradeTimestamp = Timestamp.now().toDate();
     const today = tradeTimestamp.toLocaleString().split(',')[0];
-    let starting = details.trades[today]?.starting;
-    if (!starting) {
-      starting = details.current
+    let starting = details.current;
+    if (details.trades[today]?.starting !== undefined) {
+      starting = details.trades[today].starting
     }
+    console.log(starting);
     let updatedTrades = {};
     if (details.trades[today]?.positions !== undefined) {
       updatedTrades = details.trades[today]?.positions;
@@ -118,7 +119,7 @@ export const AuthContextProvider = ({ children }) => {
         trades: {
           ...details.trades,
           [today]: {
-            starting,
+            starting: starting,
             positions: updatedTrades
           } 
         }

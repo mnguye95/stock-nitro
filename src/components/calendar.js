@@ -170,7 +170,7 @@ const Calendar = (props) => {
 
   let cells = [];
   let defaultCellStyle =
-    "flex flex-col p-1 rounded-[2%] text-black bg-white font-bungee text-2xl";
+    "flex flex-col p-1 rounded-[2%] text-black bg-white font-bungee text-2xl justify-between";
 
   // Names of Weekdays
   let namesOfDays = weekdaysShort.map((day) => {
@@ -222,15 +222,20 @@ const Calendar = (props) => {
     //   }
     // }
 
+    let sum = 0;
     let trades = [];
     let dayTrades = props.trades[
       `${state.dateContext.format("MM")}/${d}/${state.dateContext.format(
         "YYYY"
       )}`
     ] || [];
+    console.log(dayTrades);
     const positions = dayTrades["positions"] || {};
     Object.keys(positions).sort().forEach((key) => {
       let trade = positions[key];
+     if (trade.sell_price) {
+      sum = sum + (trade.sell_price - trade.buy_price) * 100 * trade.quanity;
+     }
       trades.push(
         { time: key, ...trade });
     });
@@ -239,11 +244,12 @@ const Calendar = (props) => {
       day: d,
       className: className,
       trades: trades,
+      starting: dayTrades.starting,
+      sum,
     });
   }
 
   //
-  console.log();
 
   // console.log("days: ", daysInMonth);
 
@@ -314,7 +320,9 @@ const Calendar = (props) => {
             key={i + cell.day}
             className={cell.className}
           >
-            {cell.day}
+            <div className="flex justify-between">
+              <p>{cell.day}</p>
+            </div>
             <div className="md:flex flex-wrap gap-2 hidden">
               {cell.trades.map((trade, index) => (
                 <div key={index}>
@@ -336,6 +344,18 @@ const Calendar = (props) => {
                   />
                 </div>
               ))}
+            </div>
+            <div className="flex justify-between">
+              {cell.sum != 0 && 
+              <><p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'}`}>{new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0,
+              }).format(cell.sum)}</p><p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'}`}>{Math.round(
+                (cell.sum - cell.starting) / cell.starting
+               * 100)}
+              %</p></>}
             </div>
           </div>
         );
