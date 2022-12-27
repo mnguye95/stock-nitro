@@ -84,6 +84,10 @@ export const AuthContextProvider = ({ children }) => {
     if (details.trades[day.key]?.positions !== undefined) {
       updatedTrades = details.trades[day.key]?.positions;
     }
+    let starting = details.current;
+    if (details.trades[day.key]?.starting !== undefined) {
+      starting = details.trades[day.key].starting
+    }
     updatedTrades[timestamp] = {...updatedTrades[timestamp], time_sold: timeSold, sell_price: price_sold, sell_notes}
     console.log(updatedTrades);
     await updateDoc(doc(db, "usage", details.id), {
@@ -92,6 +96,7 @@ export const AuthContextProvider = ({ children }) => {
       trades: {
         ...details.trades,
         [day.key]: {
+          starting,
           positions: updatedTrades
         } 
       }

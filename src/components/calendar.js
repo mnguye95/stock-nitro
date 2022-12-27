@@ -233,8 +233,9 @@ const Calendar = (props) => {
     const positions = dayTrades["positions"] || {};
     Object.keys(positions).sort().forEach((key) => {
       let trade = positions[key];
-     if (trade.sell_price) {
-      sum = sum + (trade.sell_price - trade.buy_price) * 100 * trade.quanity;
+     if (parseFloat(trade.sell_price)) {
+      sum = sum + (parseFloat(trade.sell_price) - parseFloat(trade.buy_price)) * 100 * trade.quanity;
+      console.log(sum);
      }
       trades.push(
         { time: key, ...trade });
@@ -244,7 +245,7 @@ const Calendar = (props) => {
       day: d,
       className: className,
       trades: trades,
-      starting: dayTrades.starting,
+      starting: dayTrades['starting'],
       sum,
     });
   }
@@ -308,7 +309,7 @@ const Calendar = (props) => {
   //   </div>
   // );
   return (
-    <div className="grid grid-cols-7 grid-rows-5 md:gap-2 w-full h-full">
+    <div className="pb-5 grid grid-cols-7 grid-rows-5 md:gap-1 w-full h-full">
       {/* {namesOfDays} */}
       {cells.map((cell, i) => {
         if (!cell.day) {
@@ -323,38 +324,41 @@ const Calendar = (props) => {
             <div className="flex justify-between">
               <p>{cell.day}</p>
             </div>
-            <div className="md:flex flex-wrap gap-2 hidden">
-              {cell.trades.map((trade, index) => (
-                <div key={index}>
+            <div className="md:flex flex-wrap gap-1 hidden">
+              {cell.trades.map((trade, index) => {
+
+                return <div key={index}>
                   <div
                     id={`trade-${cell.day}-${index}`}
                     key={index}
                     className={`${
-                      trade.sell_price
-                        ? trade.buy_price > trade.sell_price
+                      parseFloat(trade.sell_price)
+                        ? parseFloat(trade.buy_price) > parseFloat(trade.sell_price)
                           ? "bg-red-300"
                           : "bg-green-300"
                         : "bg-gray-300"
-                    } rounded-full border-2 border-black p-[0.3em]`}
+                    } rounded-full border-2 border-black p-[0.15em]`}
                   ></div>
                   <Tooltip
                     key={`tooltip-${cell.day}-${index}`}
                     anchorId={`trade-${cell.day}-${index}`}
-                    content={trade.sell_price ? `${ Math.round((trade.sell_price - trade.buy_price) / trade.buy_price * 100)}%` : ''}
+                    content={parseFloat(trade.sell_price) ? `${ Math.round((parseFloat(trade.sell_price) - parseFloat(trade.buy_price)) / parseFloat(trade.buy_price) * 100)}%` : ''}
                   />
                 </div>
-              ))}
+                })}
             </div>
             <div className="flex justify-between">
               {cell.sum != 0 && 
-              <><p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'}`}>{new Intl.NumberFormat("en-US", {
+              <><p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'} text-sm`}>{new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "USD",
                 maximumFractionDigits: 0,
                 minimumFractionDigits: 0,
-              }).format(cell.sum)}</p><p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'}`}>{Math.round(
-                (cell.sum - cell.starting) / cell.starting
-               * 100)}
+              }).format(cell.sum)}</p>
+              <p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'} text-sm`}>
+                {Math.round(
+                  ((cell.starting + cell.sum) - cell.starting) / cell.starting
+                 * 100)}
               %</p></>}
             </div>
           </div>

@@ -11,6 +11,9 @@ import Home from './pages/home';
 import { AuthContextProvider } from './context/AuthContext';
 import 'react-tooltip/dist/react-tooltip.css';
 import 'reactjs-popup/dist/index.css';
+import Features from './pages/features';
+import Pricing from './pages/pricing';
+import Demo from './pages/demo';
 
 
 function App() {
@@ -22,8 +25,10 @@ function App() {
           <Route path='/register' element={<Register/>}/>
           <Route path='/signin' element={<SignIn/>}/>
           <Route path='/journal' element={<ProtectedRoute><Journal/></ProtectedRoute>}/>
-          {/* <Route path='/pricing-plans' element={<Pricing />}/>
-          <Route path='/account' element={<ProtectedRoute><Dashboard view="Settings"/></ProtectedRoute>}/>
+          <Route path='/features' element={<Features />}/>
+          <Route path='/pricing' element={<Pricing />}/>
+          <Route path='/demo' element={<Demo />}/>
+          {/* <Route path='/account' element={<ProtectedRoute><Dashboard view="Settings"/></ProtectedRoute>}/>
           <Route path='/audit' element={<ProtectedRoute><Dashboard view="SEO Audit"/></ProtectedRoute>}/>
           <Route path='/meta-generator' element={<ProtectedRoute><Dashboard view="Meta Generator"/></ProtectedRoute>}/>
           <Route path='/suggestions' element={<ProtectedRoute><Dashboard view="Blog Suggestions"/></ProtectedRoute>}/>

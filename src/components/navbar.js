@@ -108,7 +108,7 @@ const Navbar = () => {
     <div className="flex w-full bg-purple-gray z-[5]">
       {/* Top or Desktop Nav */}
       <div className="flex w-full">
-        <div className="flex justify-between w-full p-[15px] md:px-[50px] mx-auto">
+        <div className="flex justify-between w-full p-[15px] md:px-[25px] mx-auto">
           <div className="flex items-center">
             <Link
               to="/"
@@ -121,7 +121,7 @@ const Navbar = () => {
                 src={Logo}
               />
             </Link>
-            {menu.map((item) => (
+            {!user && menu.map((item) => (
               <Link
                 key={item.anchor}
                 to={item.url}
@@ -174,12 +174,12 @@ const Navbar = () => {
               >
                 Sign In
               </Link>
-              <Link
+              {/* <Link
                 to="/register"
                 className="md:flex hidden font-space-grotesk text-purple-gray bg-magic-mint md:text-2xl text-xl items-center py-[10px] px-[15px] rounded-lg cursor-pointer hover:underline underline-offset-4 decoration-1 hover:-translate-y-0.5 duration-75"
               >
                 Register
-              </Link>
+              </Link> */}
             </div>
           )}
           {open ? (

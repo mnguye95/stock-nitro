@@ -4,13 +4,13 @@ const Menu = {
             anchor: 'Features',
             url: '/features'
         },
+        // {
+        //     anchor: 'Pricing',
+        //     url: '/pricing'
+        // },
         {
-            anchor: 'Pricing',
-            url: '/pricing'
-        },
-        {
-            anchor: 'Blog',
-            url: '/blog'
+            anchor: 'Demo',
+            url: '/demo'
         }
     ],
     in: [

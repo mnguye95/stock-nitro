@@ -97,19 +97,21 @@ const Journal = () => {
     .sort()
     .forEach((key) => {
       let trade = positions[key];
+      let buy_price = parseFloat(trade.buy_price);
+      let sell_price = parseFloat(trade.sell_price);
       let pL = Math.round(
-        ((trade.sell_price - trade.buy_price) / trade.buy_price) * 100
+        ((sell_price - buy_price) / buy_price) * 100
       );
-      let sold = trade.sell_price > 0;
+      let sold = sell_price > 0;
       console.log(pL);
       trades.push(
         <tr
           key={key}
           className={`${
-            trade.sell_price
-              ? trade.buy_price == trade.sell_price
+            sell_price
+              ? buy_price == sell_price
                 ? "bg-yellow-300"
-                : (trade.buy_price < trade.sell_price
+                : (buy_price < sell_price
                   ? "bg-green-300"
                   : "bg-red-300")
               : ""
@@ -119,12 +121,13 @@ const Journal = () => {
           <td>{moment(parseInt(key)).format("h:mmA")}</td>
           <td>{trade.type}</td>
           <td>{trade.quanity}</td>
-          <td>{formatter.format(trade.buy_price)}</td>
+          <td>{formatter.format(buy_price)}</td>
           <td>
             {sold ? (
-              formatter.format(trade.sell_price)
+              formatter.format(sell_price)
             ) : (
               <Popup
+              className="mypopup"
                 modal={true}
                 repositionOnResize={true}
                 trigger={
@@ -138,33 +141,57 @@ const Journal = () => {
                 }
                 position="left center"
               >
-                <div className="flex flex-col items-center gap-4 p-16 mx-auto">
-                  <p className="text-4xl text-center font-bold">
+                <div className="flex flex-col items-center gap-4 p-16 mx-auto bg-purple-gray text-magic-mint">
+                  <p className="text-4xl text-center font-bold font-bungee">
                     Close {trade.type}
                   </p>
-                  <div className="grid grid-cols-2 border-purple-gray border-4 rounded-md">
-                    <p className="text-2xl font-bold p-2 text-center">
+                  <div className="grid grid-cols-2 border-magic-mint border-4 rounded-md">
+                    <p className="text-2xl font-bold p-2 text-center font-space-grotesk">
                       Buy Time: {moment(parseInt(key)).format("h:mmA")}
                     </p>
-                    <p className="text-2xl font-bold p-2 text-center">
+                    <p className="text-2xl font-bold p-2 text-center font-space-grotesk">
                       Quanity: {trade.quanity}
                     </p>
-                    <p className="text-2xl font-bold p-2 text-center">
-                      Cost: {formatter.format(trade.buy_price)}
+                    <p className="text-2xl font-bold p-2 text-center font-space-grotesk">
+                      Cost: {formatter.format(buy_price)}
                     </p>
-                    <p className="text-2xl font-bold p-2 text-center">
+                    <p className="text-2xl font-bold p-2 text-center font-space-grotesk">
                       Total: {formatter.format(trade.total)}
                     </p>
                   </div>
-                  <p className="font-bold text-2xl">Sell Price</p>
-                  <input
-                    className="rounded-md border border-purple-gray p-2 appearance-none"
-                    onChange={(e) => setSellPayload({...sellPayload, sellPrice: e.target.value})}
-                    type={"number"}
-                    placeholder="Enter Close Price"
-                  />
+                  <p className="font-bold text-2xl font-space-grotesk">
+                    {today.format("MMMM Do YYYY, h:mm:ss a")}
+                  </p>
+                  <div className="flex gap-1 w-full">
+                    <div className="flex flex-col w-full">
+                      <label className="text-xs font-bungee" htmlFor="sell_price">
+                        Sell Price
+                      </label>
+                      <input
+                        id="sell_price"
+                        className="rounded-md p-2 font-space-grotesk border-purple-gray border h-full resize-none text-black"
+                        onChange={(e) => setSellPayload({...sellPayload, sellPrice: e.target.value})}
+                        type={"number"}
+                        placeholder="Enter Close Price"
+                      />  
+                    </div>
+                    <div className="flex flex-col w-full">
+                      <label className="text-xs font-bungee" htmlFor="notes">
+                        Exit Notes
+                      </label>
+                      <textarea
+                        id="notes"
+                        className="rounded-md p-3 font-space-grotesk border-purple-gray border h-full resize-none text-black"
+                        type={"text"}
+                        onChange={(e) =>
+                          setSellPayload({...sellPayload, sellNotes: e.target.value})
+                        }
+                        value={sellPayload.sellNotes}
+                      ></textarea>
+                    </div>
+                  </div>
                   <button
-                    className="text-2xl font-bold bg-red-200 py-1 px-5 rounded-md font-space-grotesk hover:scale-105 duration-75"
+                    className="text-2xl font-bold bg-purple-gray py-1 px-5 font-bungee rounded-md border border-magic-mint hover:scale-105 duration-75"
                     onClick={() =>
                       handleClose({
                         day: day,
@@ -177,25 +204,6 @@ const Journal = () => {
                   >
                     Confirm
                   </button>
-                  <div className="flex gap-1">
-                    <div className="flex flex-col">
-                      <label className="font-bungee" htmlFor="notes">
-                        Notes
-                      </label>
-                      <textarea
-                        id="notes"
-                        className="rounded-md p-1 border-purple-gray border h-full resize-none"
-                        type={"text"}
-                        onChange={(e) =>
-                          setSellPayload({...sellPayload, sellNotes: e.target.value})
-                        }
-                        value={sellPayload.sellNotes}
-                      ></textarea>
-                    </div>
-                  </div>
-                  <p className="font-bold text-2xl">
-                    {today.format("MMMM Do YYYY, h:mm:ss a")}
-                  </p>
                 </div>
               </Popup>
             )}
@@ -208,17 +216,18 @@ const Journal = () => {
               minimumFractionDigits: 0,
             }).format(trade.total)}
           </td> */}
-          {/* <td>{trade.sell_price && `${pL}%`}</td> */}
           <td>{trade.sell_price && `${new Intl.NumberFormat("en-US", {
               style: "currency",
               currency: "USD",
               maximumFractionDigits: 0,
               minimumFractionDigits: 0,
-            }).format(((trade.sell_price - trade.buy_price) * 100) * trade.quanity)}`}</td>
+            }).format(((sell_price - buy_price) * 100) * trade.quanity)}`}
+          </td>
+          <td>{trade.sell_price && `${pL}%`}</td>
           <Tooltip
-            key={key}
+            key={`tooltip-${key}`}
             anchorId={`row-${key}`}
-            // content={`Buy Notes: ${trade.buy_notes} Sell Notes: ${trade.sell_notes}`}
+            content={`Buy Notes: ${trade.buy_notes} Sell Notes: ${trade.sell_notes}`}
             place="bottom"
           >
             Buy Notes: {trade.buy_notes} <br></br> Sell Notes: {trade.sell_notes}
@@ -232,12 +241,12 @@ const Journal = () => {
       <Navbar />
       {/* <Candles/> */}
       <div className="flex md:flex-row flex-col w-full md:h-[91%] h-[50%]">
-        <div className="flex flex-col md:w-2/3 bg-gray-200 p-5 gap-4 border-purple-gray md:border-[10px]">
+        <div className="flex flex-col md:w-2/3 bg-gray-200 p-2 gap-2 border-purple-gray md:border-[10px]">
           <div className="flex md:flex-row flex-col items-center justify-between md:text-left text-center">
-            <h1 className="font-bungee font-purple-gray md:text-5xl text-2xl select-none">
+            <h1 className="font-bungee font-purple-gray md:text-3xl text-2xl select-none">
               {moment(day).format("MMMM YYYY")}
             </h1>
-            <div className="flex font-bungee md:text-4xl text-2xl select-none">
+            <div className="flex font-bungee md:text-3xl text-2xl select-none">
               <p>
                 {details.current
                   ? formatter.format(details.current)
@@ -259,8 +268,10 @@ const Journal = () => {
             <h3 className="font-bungee font-purple-gray text-center text-xl pl-3">
               {day.text} Trades
             </h3>
-            <div className="overflow-y-auto overflow-x-hidden [&_*]:font-space-grotesk border-purple-gray border-4">
-              <table className="[&_th]:bg-white [&_th]:p-1 [&_td]:p-1 [&_th]:font-bold [&_th]:text-2xl [&_td]:select-none [&_td]:text-center [&_td]:border-2 [&_td]:font-bold [&_td]:text-xl [&_thead]:sticky [&_thead]:top-0 [&_thead]:z-1 [&_th]:sticky [&_th]:top-0 [&_th]:z-1 border-collapse w-full">
+            <div className="overflow-y-auto overflow-x-auto [&_*]:font-space-grotesk border-purple-gray border-4">
+              <table className="[&_th]:bg-white [&_th]:p-[0.15rem] [&_td]:p-[0.15rem] [&_th]:font-bold [&_th]:text-xl [&_td]:select-none
+               [&_td]:text-center [&_td]:border-2 [&_td]:font-bold [&_td]:text-lg [&_thead]:sticky [&_thead]:top-0 [&_thead]:z-1 
+               [&_th]:sticky [&_th]:top-0 [&_th]:z-1 border-collapse w-full">
                 <thead>
                   <tr>
                     <th>Time</th>
@@ -268,27 +279,27 @@ const Journal = () => {
                     <th>Qty</th>
                     <th>Buy</th>
                     <th>Sell</th>
-                    {/* <th>$</th> */}
-                    <th>P/L</th>
+                    <th>$</th>
+                    <th>%</th>
                   </tr>
                 </thead>
                 <tbody>{trades}</tbody>
               </table>
             </div>
           </div>
-          <div className="flex flex-col h-1/2 w-full border-purple-gray md:border-r-[10px] md:border-b-[10px]">
-            <div className="flex flex-col w-full h-full bg-gray-100 p-5 gap-6 justify-center">
+          <div className="flex flex-col w-full border-purple-gray md:border-r-[10px] md:border-b-[10px]">
+            <div className="flex flex-col w-full bg-gray-100 p-1 px-5 justify-center">
               <h3 className="font-bungee font-purple-gray text-center text-2xl pl-3">
                 Trade Entry
               </h3>
               <div className="flex gap-1">
                 <div className="flex flex-col gap-1 h-full w-1/2 ">
-                  <label className="font-bungee" htmlFor="notes">
-                    Notes
+                  <label className="text-xs font-bungee" htmlFor="notes">
+                    Entry Notes
                   </label>
                   <textarea
                     id="notes"
-                    className="rounded-md p-1 border-purple-gray border h-full resize-none"
+                    className="rounded-md p-1 border-purple-gray border font-space-grotesk h-full resize-none"
                     type={"text"}
                     onChange={(e) =>
                       setEntry({ ...entry, buy_notes: e.target.value })
@@ -298,13 +309,13 @@ const Journal = () => {
                 </div>
                 <div className="flex flex-col gap-1 h-full w-1/2 justify-center">
                   <div className="flex flex-col gap-1">
-                    <label className="font-bungee" htmlFor="quanity">
+                    <label className="text-xs font-bungee" htmlFor="quanity">
                       Quanity
                     </label>
                     <input
                       id="quanity"
                       type={"number"}
-                      className="rounded-md p-1 border-purple-gray border"
+                      className="rounded-md p-1 border-purple-gray border font-space-grotesk"
                       placeholder="0"
                       onChange={(e) =>
                         setEntry({
@@ -317,13 +328,13 @@ const Journal = () => {
                     ></input>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="font-bungee" htmlFor="fill-price">
+                    <label className="text-xs font-bungee" htmlFor="fill-price">
                       Fill Price
                     </label>
                     <input
                       id="fill-price"
                       type={"number"}
-                      className="rounded-md p-1 border-purple-gray border"
+                      className="rounded-md p-1 border-purple-gray border font-space-grotesk"
                       placeholder="$0.00"
                       onChange={(e) =>
                         setEntry({
@@ -336,13 +347,13 @@ const Journal = () => {
                     ></input>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="font-bungee" htmlFor="total">
+                    <label className="text-xs font-bungee" htmlFor="total">
                       Total Position
                     </label>
                     <input
                       id="total"
                       type={"text"}
-                      className="rounded-md p-1 border-purple-gray border bg-white cursor-default"
+                      className="rounded-md p-1 border-purple-gray border font-space-grotesk bg-white cursor-default"
                       placeholder="$0.00"
                       disabled
                       // onChange={(e) => setEntry({...entry, total: e.target.value})}
@@ -352,7 +363,7 @@ const Journal = () => {
                 </div>
               </div>
               {error ? (
-                <p className="border-rose-600 bg-rose-200 text-rose-500 rounded-md text-2xl font-bold p-2 text-center">
+                <p className="border-rose-600 bg-rose-200 text-rose-500 rounded-md text-sm font-bold p-[0.15rem] text-center font-space-grotesk">
                   {error}
                 </p>
               ) : (
