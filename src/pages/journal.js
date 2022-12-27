@@ -264,7 +264,7 @@ const Journal = () => {
           <Calendar trades={details.trades} onDayClick={onDayClick} />
         </div>
         <div className="flex md:flex-col flex-col-reverse md:w-1/3">
-          <div className="flex flex-col h-1/2 w-full border-purple-gray md:border-r-[10px] md:border-t-[10px] md:border-b-[10px] p-5 gap-2">
+          <div className="flex flex-col h-2/3 w-full border-purple-gray md:border-r-[10px] md:border-t-[10px] md:border-b-[10px] p-5 gap-2">
             <h3 className="font-bungee font-purple-gray text-center text-xl pl-3">
               {day.text} Trades
             </h3>

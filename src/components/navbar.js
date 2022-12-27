@@ -108,7 +108,7 @@ const Navbar = () => {
     <div className="flex w-full bg-purple-gray z-[5]">
       {/* Top or Desktop Nav */}
       <div className="flex w-full">
-        <div className="flex justify-between w-full p-[15px] md:px-[25px] mx-auto">
+        <div className="flex justify-between w-full p-[5px] py-2 md:px-[25px] mx-auto">
           <div className="flex items-center">
             <Link
               to="/"

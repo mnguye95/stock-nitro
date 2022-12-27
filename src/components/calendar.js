@@ -234,7 +234,7 @@ const Calendar = (props) => {
     Object.keys(positions).sort().forEach((key) => {
       let trade = positions[key];
      if (parseFloat(trade.sell_price)) {
-      sum = sum + (parseFloat(trade.sell_price) - parseFloat(trade.buy_price)) * 100 * trade.quanity;
+      sum = sum + (parseFloat(trade.sell_price) - parseFloat(trade.buy_price)) * 100 * parseInt(trade.quanity);
       console.log(sum);
      }
       trades.push(
@@ -357,7 +357,7 @@ const Calendar = (props) => {
               }).format(cell.sum)}</p>
               <p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'} text-sm`}>
                 {Math.round(
-                  ((cell.starting + cell.sum) - cell.starting) / cell.starting
+                  ((parseFloat(cell.starting) + parseFloat(cell.sum)) - parseFloat(cell.starting)) / parseFloat(cell.starting)
                  * 100)}
               %</p></>}
             </div>
