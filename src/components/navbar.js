@@ -4,8 +4,6 @@ import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { UserAuth } from "../context/AuthContext";
 import { useScrollPosition } from "../util/useScrollPosition";
 import { Link } from "react-router-dom";
-import moment from "moment";
-// import Logo from "../assets/Logo";
 import Logo from "../assets/flame.svg";
 
 const Navbar = () => {
@@ -32,20 +30,21 @@ const Navbar = () => {
     const everyThirty = 30 * 60;
     const everyHour = 60 * 60;
 
-    // get the next occurance of this timers
+    // Get the next occurance of this timers
     const nextThree = everyThree * Math.ceil(seconds / everyThree);
     const nextFive = everyFive * Math.ceil(seconds / everyFive);
     const nextFifthteen = everyFifthteen * Math.ceil(seconds / everyFifthteen);
     const nextThirty = everyThirty * Math.ceil(seconds / everyThirty);
     const nextHour = everyHour * Math.ceil(seconds / everyHour);
 
-    // get the time different from next occurance and Now()
+    // Get the time different from next occurance and Now()
     const threeLeft = nextThree - seconds;
     const fiveLeft = nextFive - seconds;
     const fifthteenLeft = nextFifthteen - seconds;
     const thirtyLeft = nextThirty - seconds;
     const hourLeft = nextHour - seconds;
 
+    // Calculate the minutes and seconds for each candle.
     const threeTime = {
       mins: Math.floor(threeLeft / 60),
       secs: threeLeft % 60,
@@ -67,6 +66,7 @@ const Navbar = () => {
       secs: hourLeft % 60,
     };
 
+    // Set state for each candle.
     setTime({
       threeMins:
         ("0" + threeTime.mins).slice(-2) +
@@ -87,6 +87,7 @@ const Navbar = () => {
     });
   }
 
+  // Constantly updating the candles
   useEffect(() => {
     const timerId = setInterval(refreshCandles, 1000);
     return function cleanup() {
@@ -94,6 +95,7 @@ const Navbar = () => {
     };
   }, []);
 
+  // User log out
   const handleClick = async () => {
     try {
       await logOut();
@@ -174,12 +176,6 @@ const Navbar = () => {
               >
                 Sign In
               </Link>
-              {/* <Link
-                to="/register"
-                className="md:flex hidden font-space-grotesk text-purple-gray bg-magic-mint md:text-2xl text-xl items-center py-[10px] px-[15px] rounded-lg cursor-pointer hover:underline underline-offset-4 decoration-1 hover:-translate-y-0.5 duration-75"
-              >
-                Register
-              </Link> */}
             </div>
           )}
           {open ? (
@@ -199,9 +195,6 @@ const Navbar = () => {
           )}
         </div>
       </div>
-      {/* <div className='absolute flex flex-col top-0 left-0 bg-purple-gray border border-r-magic-mint min-h-full max-w-[400px]'>
-              <p className='text-white font-bold text-xl '>Stock Nitro</p>
-      </div> */}
     </div>
   );
 };

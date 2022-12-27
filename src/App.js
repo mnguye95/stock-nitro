@@ -28,12 +28,6 @@ function App() {
           <Route path='/features' element={<Features />}/>
           <Route path='/pricing' element={<Pricing />}/>
           <Route path='/demo' element={<Demo />}/>
-          {/* <Route path='/account' element={<ProtectedRoute><Dashboard view="Settings"/></ProtectedRoute>}/>
-          <Route path='/audit' element={<ProtectedRoute><Dashboard view="SEO Audit"/></ProtectedRoute>}/>
-          <Route path='/meta-generator' element={<ProtectedRoute><Dashboard view="Meta Generator"/></ProtectedRoute>}/>
-          <Route path='/suggestions' element={<ProtectedRoute><Dashboard view="Blog Suggestions"/></ProtectedRoute>}/>
-          <Route path='/image-geotag' element={<ProtectedRoute><Dashboard view="Image Local Geotag"/></ProtectedRoute>}/>
-          <Route path='/dashboard' element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/> */}
         </Routes>
       </AuthContextProvider>
     </div>

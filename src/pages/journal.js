@@ -6,7 +6,6 @@ import moment from "moment";
 import Navbar from "../components/navbar";
 import { Tooltip } from "react-tooltip";
 import Popup from "reactjs-popup";
-// import Candles from "../components/candles";
 
 const Journal = () => {
   const { details, addTrade, closeTrade, formatter } = UserAuth();
@@ -239,7 +238,6 @@ const Journal = () => {
   return (
     <div className="w-full md:h-screen bg-white md:overflow-hidden">
       <Navbar />
-      {/* <Candles/> */}
       <div className="flex md:flex-row flex-col w-full md:h-[91%] h-[50%]">
         <div className="flex flex-col md:w-2/3 bg-gray-200 p-2 gap-2 border-purple-gray md:border-[10px]">
           <div className="flex md:flex-row flex-col items-center justify-between md:text-left text-center">

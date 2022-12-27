@@ -77,11 +77,6 @@ export default function Demo() {
               </Link>
             </p>
           </div>
-          {/* Right Section */}
-          {/* <div className='flex p-5 w-1/2'>
-            <img src=''/>
-            <h3 className="text-lg md:text-xl md:text-purple-gray text-magic-mint font-space-grotesk">Something</h3>
-          </div> */}
         </div>
       </div>
     </div>

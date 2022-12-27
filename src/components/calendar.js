@@ -209,105 +209,39 @@ const Calendar = (props) => {
       className += " border-black border-2";
     }
 
-    // let dayTrades = [];
-    // let trades =
-    //   props.trades[
-    //     `${state.dateContext.format("MM")}/${d}/${state.dateContext.format(
-    //       "YYYY"
-    //     )}`
-    //   ];
-    // if (trades) {
-    //   for (const trade in trades['positions']) {
-    //     dayTrades.push({ time: trade, ...trades['positions'][trade] });
-    //   }
-    // }
-
     let sum = 0;
     let trades = [];
-    let dayTrades = props.trades[
-      `${state.dateContext.format("MM")}/${d}/${state.dateContext.format(
-        "YYYY"
-      )}`
-    ] || [];
-    console.log(dayTrades);
+    let dayTrades =
+      props.trades[
+        `${state.dateContext.format("MM")}/${d}/${state.dateContext.format(
+          "YYYY"
+        )}`
+      ] || [];
     const positions = dayTrades["positions"] || {};
-    Object.keys(positions).sort().forEach((key) => {
-      let trade = positions[key];
-     if (parseFloat(trade.sell_price)) {
-      sum = sum + (parseFloat(trade.sell_price) - parseFloat(trade.buy_price)) * 100 * parseInt(trade.quanity);
-      console.log(sum);
-     }
-      trades.push(
-        { time: key, ...trade });
-    });
+    Object.keys(positions)
+      .sort()
+      .forEach((key) => {
+        let trade = positions[key];
+        if (parseFloat(trade.sell_price)) {
+          sum =
+            sum +
+            (parseFloat(trade.sell_price) - parseFloat(trade.buy_price)) *
+              100 *
+              parseInt(trade.quanity);
+          console.log(sum);
+        }
+        trades.push({ time: key, ...trade });
+      });
 
     cells.push({
       day: d,
       className: className,
       trades: trades,
-      starting: dayTrades['starting'],
+      starting: dayTrades["starting"],
       sum,
     });
   }
 
-  //
-
-  // console.log("days: ", daysInMonth);
-
-  // var totalSlots = [...blanks, ...daysInMonthNow];
-  // let rows = [];
-  // let cells = [];
-
-  // totalSlots.forEach((row, i) => {
-  //   if (i % 7 !== 0) {
-  //     cells.push(row);
-  //   } else {
-  //     let insertRow = cells.slice();
-  //     rows.push(insertRow);
-  //     cells = [];
-  //     cells.push(row);
-  //   }
-  //   if (i === totalSlots.length - 1) {
-  //     let insertRow = cells.slice();
-  //     rows.push(insertRow);
-  //   }
-  // });
-
-  // let trElems = rows.map((d, i) => {
-  //   return <tr key={i * 100}>{d}</tr>;
-  // });
-
-  // return (
-  //   <div className="p-0 m-0 border-2-sky-300 h-full">
-  //     <table className="p-0 m-0 bg-white border-spacing-0 border-collapse w-full h-full">
-  //       <thead className="text-center w-full">
-  //         <tr className="p-0 m-0 border-b-1 border-dashed border-sky-300 w-full ">
-  //           <td className="border-spacing-0 pl-[5px] mx-auto" colSpan="5">
-  //             <MonthNav /> <YearNav />
-  //           </td>
-  //           <td colSpan="2" className="absolute top-2 text-xl r-[3px]">
-  //             <i
-  //               className="prev fa fa-fw fa-chevron-left"
-  //               onClick={(e) => {
-  //                 prevMonth();
-  //               }}
-  //             ></i>
-  //             <i
-  //               className="prev fa fa-fw fa-chevron-right"
-  //               onClick={(e) => {
-  //                 nextMonth();
-  //               }}
-  //             ></i>
-  //           </td>
-  //         </tr>
-  //       </thead>
-  //       <tbody>
-  //         <tr>{wdElements}</tr>
-  //         {trElems}
-  //       </tbody>
-  //     </table>
-  //   </div>
-  // );
   return (
     <div className="pb-5 grid grid-cols-7 grid-rows-5 md:gap-1 w-full h-full">
       {/* {namesOfDays} */}
@@ -326,40 +260,69 @@ const Calendar = (props) => {
             </div>
             <div className="md:flex flex-wrap gap-1 hidden">
               {cell.trades.map((trade, index) => {
-
-                return <div key={index}>
-                  <div
-                    id={`trade-${cell.day}-${index}`}
-                    key={index}
-                    className={`${
-                      parseFloat(trade.sell_price)
-                        ? parseFloat(trade.buy_price) > parseFloat(trade.sell_price)
-                          ? "bg-red-300"
-                          : "bg-green-300"
-                        : "bg-gray-300"
-                    } rounded-full border-2 border-black p-[0.15em]`}
-                  ></div>
-                  <Tooltip
-                    key={`tooltip-${cell.day}-${index}`}
-                    anchorId={`trade-${cell.day}-${index}`}
-                    content={parseFloat(trade.sell_price) ? `${ Math.round((parseFloat(trade.sell_price) - parseFloat(trade.buy_price)) / parseFloat(trade.buy_price) * 100)}%` : ''}
-                  />
-                </div>
-                })}
+                return (
+                  <div key={index}>
+                    <div
+                      id={`trade-${cell.day}-${index}`}
+                      key={index}
+                      className={`${
+                        parseFloat(trade.sell_price)
+                          ? parseFloat(trade.buy_price) >
+                            parseFloat(trade.sell_price)
+                            ? "bg-red-300"
+                            : "bg-green-300"
+                          : "bg-gray-300"
+                      } rounded-full border-2 border-black p-[0.15em]`}
+                    ></div>
+                    <Tooltip
+                      key={`tooltip-${cell.day}-${index}`}
+                      anchorId={`trade-${cell.day}-${index}`}
+                      content={
+                        parseFloat(trade.sell_price)
+                          ? `${Math.round(
+                              ((parseFloat(trade.sell_price) -
+                                parseFloat(trade.buy_price)) /
+                                parseFloat(trade.buy_price)) *
+                                100
+                            )}%`
+                          : ""
+                      }
+                    />
+                  </div>
+                );
+              })}
             </div>
             <div className="flex justify-between">
-              {cell.sum != 0 && 
-              <><p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'} text-sm`}>{new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-                maximumFractionDigits: 0,
-                minimumFractionDigits: 0,
-              }).format(cell.sum)}</p>
-              <p className={`${cell.sum > 0 ? 'text-green-500' : 'text-red-500'} text-sm`}>
-                {Math.round(
-                  ((parseFloat(cell.starting) + parseFloat(cell.sum)) - parseFloat(cell.starting)) / parseFloat(cell.starting)
-                 * 100)}
-              %</p></>}
+              {cell.sum != 0 && (
+                <>
+                  <p
+                    className={`${
+                      cell.sum > 0 ? "text-green-500" : "text-red-500"
+                    } text-sm`}
+                  >
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                      maximumFractionDigits: 0,
+                      minimumFractionDigits: 0,
+                    }).format(cell.sum)}
+                  </p>
+                  <p
+                    className={`${
+                      cell.sum > 0 ? "text-green-500" : "text-red-500"
+                    } text-sm`}
+                  >
+                    {Math.round(
+                      ((parseFloat(cell.starting) +
+                        parseFloat(cell.sum) -
+                        parseFloat(cell.starting)) /
+                        parseFloat(cell.starting)) *
+                        100
+                    )}
+                    %
+                  </p>
+                </>
+              )}
             </div>
           </div>
         );

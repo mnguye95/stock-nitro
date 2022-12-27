@@ -24,7 +24,6 @@ export default function SignIn() {
       await logIn(email, password);
       navigate("/journal");
     } catch (er) {
-      console.log(er.message);
       setError(er.message.split(":")[1]);
     }
   };
@@ -35,9 +34,7 @@ export default function SignIn() {
     try {
       await forgotPassword(email);
     } catch (er) {
-      console.log(er.message);
       setError(er.message);
-      console.log(error);
     }
   };
   return (
