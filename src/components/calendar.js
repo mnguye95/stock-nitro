@@ -152,7 +152,7 @@ const Calendar = (props) => {
     setState({
       ...state,
       selectedDay: moment(
-        `${state.dateContext.format("MM")}/${day}/${state.dateContext.format(
+        `${state.dateContext.format("M")}/${day}/${state.dateContext.format(
           "YYYY"
         )}`
       ),
@@ -161,7 +161,7 @@ const Calendar = (props) => {
       props.onDayClick(
         e,
         moment(
-          `${state.dateContext.format("MM")}/${day}/${state.dateContext.format(
+          `${state.dateContext.format("M")}/${day}/${state.dateContext.format(
             "YYYY"
           )}`
         )
@@ -213,7 +213,7 @@ const Calendar = (props) => {
     let trades = [];
     let dayTrades =
       props.trades[
-        `${state.dateContext.format("MM")}/${d}/${state.dateContext.format(
+        `${state.dateContext.format("M")}/${d}/${state.dateContext.format(
           "YYYY"
         )}`
       ] || [];

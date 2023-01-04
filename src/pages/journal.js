@@ -9,6 +9,7 @@ import Popup from "reactjs-popup";
 
 const Journal = () => {
   const { details, addTrade, closeTrade, formatter } = UserAuth();
+  console.log(details);
   const [isOpen, setIsOpen] = useState(false);
   const [today, setToday] = useState(moment());
   const [day, selectDay] = useState({
@@ -47,7 +48,7 @@ const Journal = () => {
   const handleTrade = async () => {
     if (entry.total <= details.current) {
       if (entry.quanity > 0 && entry.buy_price > 0) {
-        await addTrade(entry).finally(() =>
+        await addTrade({...entry, day: day.key}).finally(() =>
           {
             setEntry({
               type: "",
@@ -85,7 +86,8 @@ const Journal = () => {
 
   const onDayClick = (e, dateContext) => {
     let text = dateContext.format("MMM Do YYYY");
-    let key = dateContext.format("MM/DD/YYYY");
+    let key = dateContext.format("M/D/YYYY");
+    console.log({text, key});
     selectDay({ text, key });
   };
 
@@ -102,7 +104,6 @@ const Journal = () => {
         ((sell_price - buy_price) / buy_price) * 100
       );
       let sold = sell_price > 0;
-      console.log(pL);
       trades.push(
         <tr
           key={key}

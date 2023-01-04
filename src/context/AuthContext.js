@@ -105,7 +105,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const addTrade = async (payload) => {
     const tradeTimestamp = Timestamp.now().toDate();
-    const today = tradeTimestamp.toLocaleString().split(',')[0];
+    const today = payload.day || tradeTimestamp.toLocaleString().split(',')[0];
     let starting = details.current;
     if (details.trades[today]?.starting !== undefined) {
       starting = details.trades[today].starting
